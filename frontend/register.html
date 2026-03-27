@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agriconnect Create Account</title>
+    <title> Create Account</title>
     <!-- Assuming style.css is in the same 'frontend' folder -->
     <link rel="stylesheet" href="style.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -13,7 +13,7 @@
         <div class="card">
             <header class="logo">
                 <i class="fas fa-leaf"></i>
-                <h1>Agriconnect</h1>
+                <h1>FarmTech</h1>
             </header>
             <h2 class="form-title">Create Account</h2>
             <form id="registerForm">
@@ -73,7 +73,7 @@
         // API Base URL - Update this to match your backend URL
         const API_BASE_URL = window.location.hostname === 'localhost' 
             ? 'http://localhost:5001' 
-            : 'https://agriconnect-lhhe.onrender.com';
+            : 'http://localhost:5001';
 
         const form = document.getElementById('registerForm');
         const errorDiv = document.getElementById('error-message');

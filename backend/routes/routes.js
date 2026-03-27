@@ -1,6 +1,7 @@
 import express from "express";
 import { registerUser, loginUser, getUserProfile, googleAuth, googleCallback } from "../controllers/authController.js";
 import { createProduct, getMyListings, getAllProducts, updateProduct, deleteProduct } from '../controllers/productController.js';
+import { askKnowledgeAssistant } from "../controllers/knowledgeController.js";
 import { protect } from '../middleware/authMiddleware.js';
 import passport from "../config/passport.js";
 
@@ -29,6 +30,7 @@ router.get('/products/my-listings', protect, getMyListings);
 router.get('/products', protect, getAllProducts);
 router.put('/products/:id', protect, updateProduct);
 router.delete('/products/:id', protect, deleteProduct);
+router.post('/knowledge/assist', protect, askKnowledgeAssistant);
 
 
 // router.get("/", (req,res) => { 
