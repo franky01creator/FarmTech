@@ -1,5 +1,4 @@
-import dotenv from "dotenv";
-dotenv.config(); // Load environment variables FIRST
+import "./env.js";
 
 import express from "express";
 import routes  from "./routes/routes.js"
@@ -17,8 +16,12 @@ import adminRoutes from './routes/adminRoutes.js';
 
 
 const app = express();
+// Root `npm run dev` uses live-server (e.g. :8080) while API stays on PORT; single FRONTEND_URL would block CORS.
+const isProduction = process.env.NODE_ENV === 'production';
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5001',
+    origin: isProduction
+        ? (process.env.FRONTEND_URL || 'http://localhost:5001')
+        : true,
     credentials: true
 }));
 
@@ -63,7 +66,10 @@ const PORT = process.env.PORT || 5001; // Use Render's port, or 5001 locally
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
-    console.log(`Frontend available at http://localhost:${PORT}`);
+    console.log(`API + static frontend: http://localhost:${PORT}`);
+    if (!isProduction) {
+        console.log('Dev: live-server on another port is allowed by CORS when NODE_ENV is not production.');
+    }
 });
 
 export default app;
