@@ -232,6 +232,7 @@
                 const ordersSection = document.getElementById('ordersSection');
                 if (ordersSection.style.display === 'none') {
                     ordersSection.style.display = 'block';
+                    fetchSupplierOrders();
                     ordersSection.scrollIntoView({ behavior: 'smooth' });
                 } else {
                     ordersSection.style.display = 'none';
@@ -356,10 +357,83 @@
 
             document.getElementById('revenueCount').textContent = `$${monthlyEstimatedRevenue.toFixed(0)}`;
 
-            // Orders to process – real value would come from an Orders API.
-            // For now, this is set to 0 so it always reflects a dynamic value, not a hardcoded demo number.
-            document.getElementById('ordersCount').textContent = '0';
+            // Orders to process from real incoming orders API.
+            fetch(`${API_BASE_URL}/api/orders/incoming`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            })
+                .then((res) => res.ok ? res.json() : [])
+                .then((orders) => {
+                    const pending = Array.isArray(orders) ? orders.filter((o) => o.status === 'pending').length : 0;
+                    document.getElementById('ordersCount').textContent = pending;
+                })
+                .catch(() => {
+                    document.getElementById('ordersCount').textContent = '0';
+                });
         }
+
+        async function fetchSupplierOrders() {
+            const ordersContent = document.getElementById('ordersContent');
+            ordersContent.innerHTML = '<p style="text-align:center; color:#7f8c8d;">Loading orders...</p>';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/orders/incoming`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                const orders = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(orders.message || 'Failed to fetch orders');
+                }
+
+                if (!orders.length) {
+                    ordersContent.innerHTML = '<p style="color:#7f8c8d; text-align:center;">No incoming orders yet.</p>';
+                    return;
+                }
+
+                ordersContent.innerHTML = orders.map((order) => {
+                    const buyer = order.buyer?.fullName || 'Unknown buyer';
+                    const summary = order.items.map((item) => `${item.productName} x${item.quantity}`).join(', ');
+                    return `
+                        <div style="border:1px solid #ddd; border-radius:8px; padding:12px; margin-bottom:10px;">
+                            <p style="margin:0 0 6px 0;"><strong>Buyer:</strong> ${buyer}</p>
+                            <p style="margin:0 0 6px 0;"><strong>Items:</strong> ${summary}</p>
+                            <p style="margin:0 0 10px 0;"><strong>Status:</strong> ${order.status}</p>
+                            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                <button onclick="supplierUpdateOrderStatus('${order._id}', 'confirmed')">Confirm</button>
+                                <button onclick="supplierUpdateOrderStatus('${order._id}', 'shipped')">Ship</button>
+                                <button onclick="supplierUpdateOrderStatus('${order._id}', 'delivered')">Deliver</button>
+                                <button onclick="supplierUpdateOrderStatus('${order._id}', 'cancelled')">Cancel</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                ordersContent.innerHTML = `<p style="color:red; text-align:center;">${error.message}</p>`;
+            }
+        }
+
+        async function supplierUpdateOrderStatus(orderId, status) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}/status`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ status })
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to update order status');
+                }
+                fetchSupplierOrders();
+                updateMetrics(allSupplierProducts);
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        window.supplierUpdateOrderStatus = supplierUpdateOrderStatus;
 
         // Delete product
         async function deleteProduct(productId) {
@@ -368,7 +442,7 @@
             }
 
             try {
-                const response = await fetch(`https://agriconnect-lhhe.onrender.com/api/products/${productId}`, {
+                const response = await fetch(`${API_BASE_URL}/api/products/${productId}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${authToken}`
@@ -429,7 +503,7 @@
                 formMessage.style.display = 'none';
 
                 try {
-                    const response = await fetch('https://agriconnect-lhhe.onrender.com/api/products', {
+                    const response = await fetch(`${API_BASE_URL}/api/products`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

@@ -4,8 +4,19 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 
+const hasValidGoogleOAuthConfig = () => {
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+
+    if (!clientId || !clientSecret) return false;
+    if (clientId.includes("your-client-id-here")) return false;
+    if (clientSecret.includes("your-client-secret-here")) return false;
+
+    return true;
+};
+
 // Configure Google OAuth Strategy (only if credentials are available)
-if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+if (hasValidGoogleOAuthConfig()) {
     passport.use(
         new GoogleStrategy(
             {

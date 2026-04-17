@@ -70,10 +70,10 @@ export const getMyListings = async (req, res) => {
 
 export const getAllProducts = async (req, res) => {
     try {
-        // 1. Find all products
-        // 2. Populate 'farmer' name (needed for the card display)
-        // 3. Sort by newest first
-        const products = await Product.find({})
+        // Marketplace should only show farmer produce, not supplier listings.
+        const products = await Product.find({
+                                      category: { $not: /^supplier/i }
+                                  })
                                       .populate('farmer', 'fullName')
                                       .sort({ createdAt: -1 });
         
@@ -81,6 +81,23 @@ export const getAllProducts = async (req, res) => {
     } catch (error) {
         console.error('Error fetching all products:', error);
         res.status(500).json({ message: 'Server error fetching products' });
+    }
+};
+
+// @desc    Get supplier products only
+// @route   GET /api/products/supplier
+export const getSupplierProducts = async (req, res) => {
+    try {
+        const products = await Product.find({
+                                      category: /^supplier/i
+                                  })
+                                      .populate('farmer', 'fullName')
+                                      .sort({ createdAt: -1 });
+
+        res.status(200).json(products);
+    } catch (error) {
+        console.error('Error fetching supplier products:', error);
+        res.status(500).json({ message: 'Server error fetching supplier products' });
     }
 };
 

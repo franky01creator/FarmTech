@@ -1,13 +1,28 @@
 import "dotenv/config";
 import mongoose from "mongoose";
+import { ServerApiVersion } from "mongodb";
 
- export async function connectDB() {
+export async function connectDB() {
+    const uri = process.env.MONGO_URI;
+
+    if (!uri) {
+        console.error("DB not Connected: MONGO_URI is not set");
+        process.exit(1);
+    }
+
     try {
-        const conn = await mongoose.connect(process.env.MONGO_URI);
-        console.log("MongoDB Connected");
+        await mongoose.connect(uri, {
+            serverApi: {
+                version: ServerApiVersion.v1,
+                strict: true,
+                deprecationErrors: true,
+            },
+        });
 
+        await mongoose.connection.db.admin().command({ ping: 1 });
+        console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } catch (error) {
-        console.error("DB not Connected");
-        process.exit(1)
+        console.error("DB not Connected", error);
+        process.exit(1);
     }
 }
