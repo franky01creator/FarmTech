@@ -6,6 +6,7 @@
     <title>Supplier Hub </title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="js/api-config.js"></script>
 </head>
 <body class="supplier-hub-page-body">
     <div class="header">
@@ -176,11 +177,6 @@
         let allSupplierProducts = [];
         let currentUser = null;
         let authToken = null;
-
-        // Base API URL helper (local vs deployed)
-        const API_BASE_URL = window.location.hostname === 'localhost'
-            ? 'http://localhost:5001'
-            : 'https://agriconnect-lhhe.onrender.com';
 
         document.addEventListener('DOMContentLoaded', async () => {
             authToken = localStorage.getItem('authToken');

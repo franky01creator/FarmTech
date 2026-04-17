@@ -91,6 +91,7 @@
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/api-config.js"></script>
 </head>
 <body>
     <header class="header">
@@ -189,10 +190,6 @@
     </div>
 
     <script>
-        const API_BASE_URL = window.location.hostname === 'localhost'
-            ? 'http://localhost:5001'
-            : 'http://localhost:5001';
-
         // --- MOCK DATA (Simulating a Database) ---
         const articlesDB = [
             {

@@ -136,6 +136,17 @@ When deploying to production:
 5. Update the OAuth consent screen with your production domain
 6. Submit your app for verification if you plan to make it public (required for production)
 
+### Example: Render (single Web Service)
+
+If the app is served at `https://farmtech-k023.onrender.com` (same service for static files + API), set in Render **Environment**:
+
+- `FRONTEND_URL` = `https://farmtech-k023.onrender.com`
+- `GOOGLE_CALLBACK_URL` = `https://farmtech-k023.onrender.com/api/auth/google/callback`
+- `MONGO_URI`, `JWT_SECRET`, `SESSION_SECRET`, `OPENAI_API_KEY` (if used), etc.
+
+Google Cloud **Authorized JavaScript origins**: `https://farmtech-k023.onrender.com`  
+**Authorized redirect URIs**: `https://farmtech-k023.onrender.com/api/auth/google/callback`
+
 ## Additional Resources
 
 - [Google OAuth 2.0 Documentation](https://developers.google.com/identity/protocols/oauth2)

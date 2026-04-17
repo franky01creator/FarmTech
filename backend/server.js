@@ -16,12 +16,13 @@ import adminRoutes from './routes/adminRoutes.js';
 
 
 const app = express();
-// Root `npm run dev` uses live-server (e.g. :8080) while API stays on PORT; single FRONTEND_URL would block CORS.
+// Dev: reflect browser origin (live-server vs API port). Prod: prefer FRONTEND_URL; if unset, reflect origin (same host on Render).
 const isProduction = process.env.NODE_ENV === 'production';
+const corsOrigin = isProduction
+    ? (process.env.FRONTEND_URL || true)
+    : true;
 app.use(cors({
-    origin: isProduction
-        ? (process.env.FRONTEND_URL || 'http://localhost:5001')
-        : true,
+    origin: corsOrigin,
     credentials: true
 }));
 
